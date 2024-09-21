@@ -2,6 +2,11 @@
   "name": "juggernaut360",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Anthony Reynolds",
+    "email": "info@rbmarketingandanalytics.com",
+    "url": "https://rbmarketingandanalytics.com"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,9 +14,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth/mongodb-adapter": "^3.5.0",
+    "@headlessui/react": "^2.1.8",
+    "@headlessui/tailwindcss": "^0.2.1",
+    "@heroicons/react": "^2.1.5",
+    "@tailwindcss/forms": "^0.5.9",
+    "bcrypt": "^5.1.1",
+    "mongodb": "^6.9.0",
+    "mongoose": "^8.6.3",
+    "next": "14.2.12",
+    "next-auth": "^4.24.7",
+    "nodemailer": "^6.9.15",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.12"
+    "react-toastify": "^10.0.5"
   },
   "devDependencies": {
     "postcss": "^8",
