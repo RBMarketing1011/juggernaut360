@@ -3,7 +3,9 @@ module.exports = {
   content: [
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./{src,mdx}/**/*.{js,mjs,jsx,ts,tsx,mdx}"
   ],
+  darkMode: 'selector',
   theme: {
     extend: {
       colors: {
@@ -33,7 +35,20 @@ module.exports = {
           900: "rgb(124 45 18)",
           950: "rgb(67 20 7)"
         }
-      }
+      },
+      // For Template Coming Soon Page
+      fontSize: {
+        '2xs': '.6875rem',
+      },
+      fontFamily: {
+        sans: 'var(--font-inter)',
+        display: 'var(--font-mona-sans)',
+      },
+      opacity: {
+        2.5: '0.025',
+        7.5: '0.075',
+        15: '0.15',
+      },
     }
   },
   plugins: [

@@ -22,7 +22,7 @@ export const metadata = {
 const Layout = ({ children }) =>
 {
   return (
-    <html className="h-full bg-white" lang="en-US">
+    <html className="h-full" lang="en-US">
       <body className={ `h-full ${ inter.className }` }>
         <AuthProvider>
           <ThemeProvider>
