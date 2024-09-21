@@ -1,6 +1,6 @@
 import connectDB from '@db/connectDB'
 import encryptPw from '@lib/encrypt/encryptPw'
-import User from '@models/User'
+import User from '@db/models/user'
 
 const getAllUsers = async (req) =>
 {
