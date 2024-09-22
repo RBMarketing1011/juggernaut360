@@ -1,5 +1,5 @@
 import connectDB from '@db/connectDB'
-import Account from '@db/models/account'
+import CompanyAccount from '@db/models/account'
 import Customer from '@db/models/customer'
 
 const getCustomersInAccount = async (req, { params }) =>
@@ -9,7 +9,7 @@ const getCustomersInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId).populate('customers')
+    const account = await CompanyAccount.findById(accountId).populate('customers')
 
     if (!account) throw new Error('Account not found')
 
@@ -29,7 +29,7 @@ const createCustomerInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId)
+    const account = await CompanyAccount.findById(accountId)
 
     if (!account) throw new Error('Account not found')
 

@@ -1,5 +1,5 @@
 import connectDB from '@db/connectDB'
-import Account from '@db/models/account'
+import CompanyAccount from '@db/models/account'
 import User from '@db/models/user'
 import encryptPw from '@lib/encrypt/encryptPw'
 
@@ -10,7 +10,7 @@ const getUserInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId).populate('users')
+    const account = await CompanyAccount.findById(accountId).populate('users')
     const user = account.users.find(user => user._id == userId)
 
     if (!user) throw new Error('User not found in account')
@@ -32,7 +32,7 @@ const updateUserInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId)
+    const account = await CompanyAccount.findById(accountId)
     const user = await User.findById(userId)
 
     if (!account || !user) throw new Error('Account or User not found')
@@ -63,7 +63,7 @@ const deleteUserInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId)
+    const account = await CompanyAccount.findById(accountId)
     const user = await User.findById(userId)
 
     if (!account || !user) throw new Error('Account or User not found')

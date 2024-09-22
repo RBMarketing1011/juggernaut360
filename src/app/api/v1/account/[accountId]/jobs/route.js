@@ -1,5 +1,5 @@
 import connectDB from '@db/connectDB'
-import Account from '@db/models/account'
+import CompanyAccount from '@db/models/account'
 import Job from '@db/models/job'
 import Customer from '@db/models/customer'
 
@@ -10,7 +10,7 @@ const getJobsInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId).populate('jobs')
+    const account = await CompanyAccount.findById(accountId).populate('jobs')
 
     if (!account) throw new Error('Account not found')
 
@@ -33,7 +33,7 @@ const createJobInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId)
+    const account = await CompanyAccount.findById(accountId)
     const customer = await Customer.findById(customerId)
 
     if (!account || !customer) throw new Error('Account or Customer not found')

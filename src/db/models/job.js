@@ -1,7 +1,7 @@
 import { Schema, models, model } from 'mongoose'
 import User from './user'
 import Customer from './customer'
-import Account from './account'
+import CompanyAccount from './account'
 
 const jobSchema = new Schema({
   account: {

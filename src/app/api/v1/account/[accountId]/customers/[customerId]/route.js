@@ -1,5 +1,5 @@
 import connectDB from '@db/connectDB'
-import Account from '@db/models/account'
+import CompanyAccount from '@db/models/account'
 import Customer from '@db/models/customer'
 
 const getCustomerInAccount = async (req, { params }) =>
@@ -9,7 +9,7 @@ const getCustomerInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId).populate('customers')
+    const account = await CompanyAccount.findById(accountId).populate('customers')
     const customer = await Customer.findById(customerId)
 
     if (!account || !customer) throw new Error('Account or Customer not found')
@@ -34,7 +34,7 @@ const updateCustomerInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId).populate('customers')
+    const account = await CompanyAccount.findById(accountId).populate('customers')
     const customer = await Customer.findById(customerId)
 
     if (!account || !customer) throw new Error('Account or Customer not found')
@@ -64,7 +64,7 @@ const deleteCustomerInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId).populate('customers')
+    const account = await CompanyAccount.findById(accountId).populate('customers')
     const customer = await Customer.findById(customerId)
 
     if (!account || !customer) throw new Error('Account or Customer not found')

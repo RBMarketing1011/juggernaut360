@@ -23,11 +23,6 @@ export const metadata = {
   title: 'Juggernaut 360®',
   description:
     'Commit is a lightweight Git client you can open from anywhere any time you’re ready to commit your work with a single keyboard shortcut. It’s fast, beautiful, and completely unnecessary.',
-  alternates: {
-    types: {
-      'application/rss+xml': `${ process.env.NEXT_PUBLIC_DOMAIN }/feed.xml`,
-    },
-  },
 }
 
 export default function RootLayout ({ children })
@@ -39,7 +34,9 @@ export default function RootLayout ({ children })
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col bg-white dark:bg-gray-950">
-        <Providers>{ children }</Providers>
+        <Providers>
+          { children }
+        </Providers>
       </body>
     </html>
   )

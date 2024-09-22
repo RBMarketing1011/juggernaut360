@@ -27,6 +27,11 @@ const userSchema = new Schema({
     type: Boolean,
     default: false
   },
+  signInOpts: {
+    type: String,
+    enum: [ 'credentials', 'email', 'google', 'facebook' ],
+    required: [ true, 'Sign in option is required' ]
+  }
 }, { timestamps: true })
 
 const User = models.User || model('User', userSchema)

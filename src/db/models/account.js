@@ -3,7 +3,7 @@ import User from './user'
 import Job from './job'
 import Customer from './customer'
 
-const accountSchema = new Schema({
+const companyAccountSchema = new Schema({
   owner: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -23,5 +23,5 @@ const accountSchema = new Schema({
   } ],
 }, { timestamps: true })
 
-const Account = models.Account || model('Account', accountSchema)
-export default Account
+const CompanyAccount = models.CompanyAccount || model('CompanyAccount', companyAccountSchema)
+export default CompanyAccount

@@ -1,5 +1,5 @@
 import connectDB from '@db/connectDB'
-import Account from '@db/models/account'
+import CompanyAccount from '@db/models/account'
 import User from '@db/models/user'
 import Customer from '@db/models/customer'
 import Job from '@db/models/job'
@@ -11,7 +11,7 @@ const getAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId)
+    const account = await CompanyAccount.findById(accountId)
 
     if (!account) throw new Error('Account not found')
 
@@ -29,7 +29,7 @@ const deleteAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId)
+    const account = await CompanyAccount.findById(accountId)
     // Delete owner and all users, customers, and jobs associated with the account
     await User.findByIdAndDelete(account.owner._id)
     await User.deleteMany({ _id: { $in: account.users } }).catch((error) =>
@@ -48,7 +48,7 @@ const deleteAccount = async (req, { params }) =>
       throw new Error(error.message)
     })
 
-    await Account.findByIdAndDelete(accountId)
+    await CompanyAccount.findByIdAndDelete(accountId)
 
     if (!account) throw new Error('Account not found')
 

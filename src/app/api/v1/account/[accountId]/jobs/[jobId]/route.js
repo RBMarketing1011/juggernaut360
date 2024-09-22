@@ -1,5 +1,5 @@
 import connectDB from '@db/connectDB'
-import Account from '@db/models/account'
+import CompanyAccount from '@db/models/account'
 import Job from '@db/models/job'
 
 const getJobInAccount = async (req, { params }) =>
@@ -9,7 +9,7 @@ const getJobInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId)
+    const account = await CompanyAccount.findById(accountId)
     const job = await Job.findById(jobId)
 
     if (!account || !job) throw new Error('Account or Job not found')
@@ -38,7 +38,7 @@ const updateJobInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId)
+    const account = await CompanyAccount.findById(accountId)
     const job = await Job.findById(jobId)
 
     if (!account || !job) throw new Error('Account or Job not found')
@@ -83,7 +83,7 @@ const deleteJobInAccount = async (req, { params }) =>
   try
   {
     await connectDB()
-    const account = await Account.findById(accountId)
+    const account = await CompanyAccount.findById(accountId)
     const job = await Job.findById(jobId)
 
     if (!account || !job) throw new Error('Account or Job not found')
