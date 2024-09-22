@@ -15,8 +15,8 @@ import '@styles/globals.css'
 const inter = Inter({ subsets: [ "latin" ] })
 
 export const metadata = {
-  title: 'Add Title Here',
-  description: 'Add Description Here'
+  title: 'Juggernaut 360®',
+  description: 'Juggernaut 360® is a software company that provides a suite of tools to help moving companies manage their operations.',
 }
 
 const Layout = ({ children }) =>

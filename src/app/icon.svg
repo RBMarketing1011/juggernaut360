@@ -1,11 +1,4 @@
-import { useId } from 'react'
-
-export function Logo (props)
-{
-  let id = useId()
-
-  return (
-    <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" { ...props }>
+<svg viewBox="0 0 32 32" fill="none" aria-hidden="true" { ...props }>
       <title>Juggernaut</title>
       <mask id={ `${ id }-m` } fill="#fff">
         <path
@@ -34,5 +27,3 @@ export function Logo (props)
         </linearGradient>
       </defs>
     </svg>
-  )
-}
