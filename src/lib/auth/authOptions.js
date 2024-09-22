@@ -86,46 +86,43 @@ const authOptions = {
 
       if (account)
       {
-        if (account.provider === 'facebook' || account.provider === 'google')
+        try
         {
-          try
+          await Sentry.startSpan({
+            name: `${ account.provider } Signin`,
+            op: 'auth',
+          }, async () =>
           {
-            await Sentry.startSpan({
-              name: `${ account.provider } Signin`,
-              op: 'auth',
-            }, async () =>
+            await connectDB()
+            const existingUser = await User.findOne({ email: profile.email })
+            if (existingUser)
             {
-              await connectDB()
-              const existingUser = await User.findOne({ email: profile.email })
-              if (existingUser)
-              {
-                allowedToSignIn = existingUser.signInOpts === account.provider
-              } else
-              {
-                const newUser = await User.create({
-                  firstname: profile.given_name || profile.name.split(' ')[ 0 ],
-                  lastname: profile.family_name || profile.name.split(' ')[ 1 ],
-                  email: profile.email,
-                  password: await encryptPw(profile.sub || profile.id),
-                  role: 'owner',
-                  isEmailVerified: true,
-                  signInOpts: account.provider,
-                })
+              allowedToSignIn = existingUser.signInOpts === account.provider
+            } else
+            {
+              const newUser = await User.create({
+                firstname: profile.given_name || profile.name.split(' ')[ 0 ],
+                lastname: profile.family_name || profile.name.split(' ')[ 1 ],
+                email: profile.email,
+                password: await encryptPw(profile.sub || profile.id),
+                role: 'owner',
+                isEmailVerified: true,
+                signInOpts: account.provider,
+              })
 
-                await CompanyAccount.create({
-                  owner: newUser._id,
-                  users: [],
-                  jobs: [],
-                  customers: [],
-                })
+              await CompanyAccount.create({
+                owner: newUser._id,
+                users: [],
+                jobs: [],
+                customers: [],
+              })
 
-                allowedToSignIn = true
-              }
-            })
-          } catch (error)
-          {
-            throw new Error(error.message)
-          }
+              allowedToSignIn = true
+            }
+          })
+        } catch (error)
+        {
+          throw new Error(error.message)
         }
       } else if (user)
       {
