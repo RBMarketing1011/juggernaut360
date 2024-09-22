@@ -1,4 +1,3 @@
-import { Img404 } from '@assets'
 import Image from 'next/image'
 
 const NotFound = () =>
@@ -42,7 +41,7 @@ const NotFound = () =>
       </footer>
       <div className="hidden lg:relative lg:col-start-2 lg:row-start-1 lg:row-end-4 lg:block">
         <Image
-          src={ Img404 }
+          src='/images/walkingInDessert.avif'
           width={ 0 }
           height={ 0 }
           alt='Walking In The Dessert'
