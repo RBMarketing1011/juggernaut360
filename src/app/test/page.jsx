@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@components/template/components/Button'
-import { sentryErrorLogger } from '@lib/helpers/sentryErrorLogger'
+import * as Sentry from '@sentry/nextjs'
 
 const TestingPage = () =>
 {
@@ -26,7 +26,13 @@ const TestingPage = () =>
           fontSize: "14px",
           margin: "18px",
         } }
-        onClick={ () => sentryErrorLogger(() => { throw new Error('Test Error Logger Error') }) }>
+        onClick={ () => Sentry.startSpan({
+          name: 'Test Span',
+          op: 'Test Span',
+        }, async () =>
+        {
+          throw new Error('Test Error Logger Error')
+        }) }>
         Test Error
       </Button>
     </main>
