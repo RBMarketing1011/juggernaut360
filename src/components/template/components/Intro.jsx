@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { IconLink } from '@components/template/components/IconLink'
 import { Logo } from '@components/template/components/Logo'
 import { SignUpForm } from '@components/template/components/SignUpForm'
+import Image from 'next/image'
 
 function BookIcon (props)
 {
@@ -51,7 +52,7 @@ export function Intro ()
       <div>
         <Link href="/" className='flex items-center gap-4'>
           <Logo className="inline-block h-8 w-auto" />
-          <p className='text-2xl font-extrabold'>Juggernaut 360</p>
+          <p className='text-2xl font-extrabold text-white'>Juggernaut 360</p>
         </Link>
       </div>
       <h1 className="mt-14 font-display text-4xl/tight font-light text-white">
@@ -69,11 +70,28 @@ export function Intro ()
 export function IntroFooter ()
 {
   return (
-    <p className="flex items-baseline gap-x-2 text-[0.8125rem]/6 text-gray-500">
-      Developed by{ ' ' }
-      <IconLink href="https://github.com/RBMarketing1011" icon={ GitHubIcon } compact>
-        Anthony Reynolds
-      </IconLink>
-    </p>
+    <div className='flex flex-col items-center gap-1'>
+      <p className="flex items-center gap-x-2 text-[0.8125rem]/6 text-gray-500">
+        A{ ' ' }
+        <a href="https://movingmasterclass.com" className='flex gap-2 hover:text-white transition-all ease-in-out'>
+          <Image
+            className='w-8 h-auto'
+            src='/images/MMC-Logo.png'
+            width={ 0 }
+            height={ 0 }
+            sizes='100vw'
+            priority
+          />
+          Moving Masterclass®
+        </a>
+        { ' ' }Company
+      </p>
+      <p className="flex items-baseline gap-x-2 text-[0.8125rem]/6 text-gray-500">
+        Developed by{ ' ' }
+        <IconLink href="https://github.com/RBMarketing1011" icon={ GitHubIcon } compact>
+          Anthony Reynolds
+        </IconLink>
+      </p>
+    </div>
   )
 }

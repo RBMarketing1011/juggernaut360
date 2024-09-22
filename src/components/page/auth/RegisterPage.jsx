@@ -3,6 +3,7 @@
 import * as Sentry from "@sentry/nextjs"
 import { signIn } from 'next-auth/react'
 import RedirectAfterSignIn from '@lib/helpers/RedirectAfterSignIn'
+import { clientLog } from '@lib/helpers/winston/clientLog'
 
 const RegisterPage = () =>
 {
@@ -17,7 +18,8 @@ const RegisterPage = () =>
 
     } catch (error)
     {
-      Sentry.captureException(error)
+      clientLog(error.message)
+      throw new Error(error.message)
     }
   }
 
