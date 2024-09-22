@@ -1,20 +1,12 @@
 'use client'
 
-import { useContext } from 'react'
 import { signIn } from 'next-auth/react'
-import * as Sentry from '@sentry/nextjs'
-import { useRouter } from 'next/navigation'
-
-import { UserContext } from '@providers/context/UserProvider'
 import RedirectAfterSignIn from '@lib/helpers/RedirectAfterSignIn'
+import { toast } from 'react-toastify'
+import { clientLog } from '@lib/helpers/winston/clientLog'
 
 const LoginPage = () =>
 {
-  const { sessionState } = useContext(UserContext)
-
-  const [ session, update ] = sessionState
-
-  const router = useRouter()
 
   const handleSignin = async (social) => 
   {
@@ -26,6 +18,8 @@ const LoginPage = () =>
 
     } catch (error)
     {
+      toast.error(error.message)
+      clientLog(error.message)
       throw new Error(error.message)
     }
   }

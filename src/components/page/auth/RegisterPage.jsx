@@ -1,20 +1,11 @@
 'use client'
 
-import { useContext } from 'react'
+import * as Sentry from "@sentry/nextjs"
 import { signIn } from 'next-auth/react'
-import * as Sentry from '@sentry/nextjs'
-import { useRouter } from 'next/navigation'
-
-import { UserContext } from '@providers/context/UserProvider'
 import RedirectAfterSignIn from '@lib/helpers/RedirectAfterSignIn'
 
 const RegisterPage = () =>
 {
-  const { sessionState } = useContext(UserContext)
-
-  const [ session, update ] = sessionState
-
-  const router = useRouter()
 
   const handleSignin = async (social) =>
   {
@@ -24,10 +15,9 @@ const RegisterPage = () =>
         redirect: false,
       })
 
-      update()
     } catch (error)
     {
-      console.error(error)
+      Sentry.captureException(error)
     }
   }
 

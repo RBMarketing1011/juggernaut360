@@ -1,5 +1,6 @@
 "use client"
 
+import { clientLog } from '@lib/helpers/winston/clientLog'
 import * as Sentry from "@sentry/nextjs"
 import Error from "next/error"
 import { useEffect } from "react"
@@ -8,6 +9,7 @@ export default function GlobalError ({ error })
 {
   useEffect(() =>
   {
+    clientLog(error.message)
     Sentry.captureException(error)
   }, [ error ])
 
