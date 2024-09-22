@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth/next'
 import { authOptions } from '@lib/auth/authOptions'
 
-export const maxDuration = 300
+// export const maxDuration = 300
 // export const dynamic = 'force-dynamic'
 
 const handler = NextAuth(authOptions)
