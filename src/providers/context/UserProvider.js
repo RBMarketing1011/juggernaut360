@@ -10,12 +10,25 @@ const UserProvider = ({ children }) =>
   // Session
   const { data: session, update } = useSession()
   // State
-  const [ user, setUser ] = useState(null)
+  const [ userAuth, setUserAuth ] = useState({
+    firstname: '',
+    lastname: '',
+    email: '',
+    password: '',
+    showPassword: false,
+    pwStrength: 0,
+    confirmPw: '',
+    showConfirmPw: false,
+    role: ''
+  })
+
+  const [ email, setEmail ] = useState('') // for forgot pw magic link
 
   return (
     <UserContext.Provider value={ {
       sessionState: [ session, update ],
-      userState: [ user, setUser ]
+      userAuthState: [ userAuth, setUserAuth ],
+      emailState: [ email, setEmail ]
     } }>
 
       { children }

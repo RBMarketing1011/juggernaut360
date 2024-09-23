@@ -12,7 +12,7 @@ const sendEarlyAccessEmail = async (email) =>
       subject: "Exclusive Early Access to Juggernaut 360® - Unlock Your Potential!",
       text: "Welcome To Juggernaut 360®",
       html: `
-      <div style='width: 50%; font-family: Arial, sans-serif;'>
+      <div style='max-width: 600px; font-family: Arial, sans-serif;'>
       <p>Welcome ${ user },</p>
       <p>Thank you for your interest in Juggernaut 360®! We are thrilled to offer you exclusive early access to our revolutionary platform.</p>
       <p>Juggernaut 360® is designed to empower you with cutting-edge tools and insights, helping you to unlock your full potential and achieve your goals like never before.</p>

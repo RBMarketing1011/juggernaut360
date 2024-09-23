@@ -1,12 +1,29 @@
 'use client'
 
-import * as Sentry from "@sentry/nextjs"
+import { useContext, useEffect } from 'react'
 import { signIn } from 'next-auth/react'
+
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
+
 import RedirectAfterSignIn from '@lib/helpers/RedirectAfterSignIn'
 import { clientLog } from '@lib/helpers/winston/clientLog'
+import { UserContext } from '@providers/context/UserProvider'
+import { validatePassword } from '@lib/helpers/validatePassword'
+import * as Sentry from '@sentry/nextjs'
+import { toast } from 'react-toastify'
 
 const RegisterPage = () =>
 {
+  const { userAuthState } = useContext(UserContext)
+  const [ userAuth, setUserAuth ] = userAuthState
+
+  useEffect(() =>
+  {
+    setUserAuth({
+      ...userAuth,
+      pwStrength: validatePassword(userAuth.password)
+    })
+  }, [ userAuth.password ])
 
   const handleSignin = async (social) =>
   {
@@ -19,8 +36,91 @@ const RegisterPage = () =>
     } catch (error)
     {
       clientLog(error.message)
-      throw new Error(error.message)
+      Sentry.captureException(error.message)
+      toast.error(error.message)
     }
+  }
+
+  const submitAddUserForm = async (e) =>
+  {
+    e.preventDefault()
+
+    if (userAuth.pwStrength <= 80)
+    {
+      toast.error('Password is weak. Please use a stronger password.')
+      return
+    }
+
+    if (userAuth.password !== userAuth.confirmPw)
+    {
+      toast.error('Passwords do not match. Please try again.')
+      return
+    }
+
+    const data = {
+      firstname: userAuth.firstname,
+      lastname: userAuth.lastname,
+      email: userAuth.email,
+      password: userAuth.password,
+      signInOpts: 'credentials',
+      role: 'owner'
+    }
+
+    try
+    {
+      const req = await fetch('/api/v1/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+
+      const res = await req.json()
+
+      if (res.success)
+      {
+        toast.success(res.success)
+
+        const signInResponse = await signIn('credentials', {
+          email: userAuth.email, // Ensure this is populated correctly
+          password: userAuth.password, // Ensure this is populated correctly
+          redirect: false
+        })
+
+        if (signInResponse?.error)
+        {
+          // Handle sign-in error (e.g., wrong credentials)
+          toast.error(signInResponse.error)
+          console.error("Sign-in failed:", signInResponse.error)
+        } else
+        {
+          // Successful sign-in
+          toast.success("Signed in successfully")
+        }
+
+      } else
+      {
+        throw new Error(res.error)
+      }
+    } catch (error)
+    {
+      clientLog(error.message)
+      Sentry.captureException(error.message)
+      toast.error(error.message)
+    }
+
+    setUserAuth(setUserAuth({
+      firstname: '',
+      lastname: '',
+      email: '',
+      password: '',
+      showPassword: false,
+      pwStrength: 0,
+      confirmPw: '',
+      showConfirmPw: false,
+      role: ''
+    }))
   }
 
   return (
@@ -46,7 +146,7 @@ const RegisterPage = () =>
 
         <div className="mt-10">
           <div>
-            <form action="#" method="POST" className="space-y-6">
+            <form onSubmit={ (e) => submitAddUserForm(e) } className="space-y-6">
               <div className='flex gap-5'>
                 <div>
                   <label htmlFor="firstname" className="block text-sm font-medium leading-6 text-gray-900">
@@ -60,6 +160,11 @@ const RegisterPage = () =>
                       required
                       autoComplete="given-name"
                       className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      value={ userAuth.firstname }
+                      onChange={ (e) => setUserAuth(prev => ({
+                        ...prev,
+                        firstname: e.target.value
+                      })) }
                     />
                   </div>
                 </div>
@@ -76,6 +181,11 @@ const RegisterPage = () =>
                       required
                       autoComplete="family-name"
                       className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      value={ userAuth.lastname }
+                      onChange={ (e) => setUserAuth(prev => ({
+                        ...prev,
+                        lastname: e.target.value
+                      })) }
                     />
                   </div>
                 </div>
@@ -93,23 +203,67 @@ const RegisterPage = () =>
                     required
                     autoComplete="email"
                     className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    value={ userAuth.email }
+                    onChange={ (e) => setUserAuth(prev => ({
+                      ...prev,
+                      email: e.target.value
+                    })) }
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                  Password
-                </label>
-                <div className="mt-2">
+                <div className="flex justify-between items-center">
+                  <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+                    Password
+                  </label>
+
+                  {
+                    userAuth.pwStrength > 0 &&
+                      userAuth.pwStrength <= 80 ?
+
+                      <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
+                        Weak
+                      </span>
+
+                      :
+
+                      userAuth.pwStrength > 80 &&
+                      <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                        Strong
+                      </span>
+                  }
+
+                </div>
+                <div className="relative mt-2">
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={ `${ userAuth.showPassword ? 'text' : 'password' }` }
                     required
                     autoComplete="current-password"
                     className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    value={ userAuth.password }
+                    onChange={ (e) => setUserAuth(prev => ({
+                      ...prev,
+                      password: e.target.value
+                    })) }
                   />
+
+                  <div className='absolute right-3 top-2'>
+                    {
+                      userAuth.showPassword ?
+                        <EyeSlashIcon className='w-5 h-5 hover:cursor-pointer' onClick={ () => setUserAuth(prev => ({
+                          ...prev,
+                          showPassword: !userAuth.showPassword
+                        })) } />
+                        :
+                        <EyeIcon className='w-5 h-5 hover:cursor-pointer' onClick={ () => setUserAuth(prev => ({
+                          ...prev,
+                          showPassword: !userAuth.showPassword
+                        })) } />
+                    }
+                  </div>
                 </div>
               </div>
 
@@ -117,15 +271,35 @@ const RegisterPage = () =>
                 <label htmlFor="confirm-password" className="block text-sm font-medium leading-6 text-gray-900">
                   Confirm Password
                 </label>
-                <div className="mt-2">
+                <div className="relative mt-2">
                   <input
                     id="confirm-password"
                     name="confirm-password"
-                    type="password"
+                    type={ `${ userAuth.showConfirmPw ? 'text' : 'password' }` }
                     required
                     autoComplete="current-password"
                     className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    value={ userAuth.confirmPw }
+                    onChange={ (e) => setUserAuth(prev => ({
+                      ...prev,
+                      confirmPw: e.target.value
+                    })) }
                   />
+
+                  <div className='absolute right-3 top-2'>
+                    {
+                      userAuth.showConfirmPw ?
+                        <EyeSlashIcon className='w-5 h-5 hover:cursor-pointer' onClick={ () => setUserAuth(prev => ({
+                          ...prev,
+                          showConfirmPw: !userAuth.showConfirmPw
+                        })) } />
+                        :
+                        <EyeIcon className='w-5 h-5 hover:cursor-pointer' onClick={ () => setUserAuth(prev => ({
+                          ...prev,
+                          showConfirmPw: !userAuth.showConfirmPw
+                        })) } />
+                    }
+                  </div>
                 </div>
               </div>
 

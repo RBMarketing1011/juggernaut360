@@ -3,7 +3,7 @@ export const validatePassword = (p) =>
   let strength = 0
   const errors = []
 
-  if (p.length > 8 && p.length < 16)
+  if (p.length >= 8 && p.length < 16)
   {
     strength += 20
   } else
@@ -43,10 +43,17 @@ export const validatePassword = (p) =>
     strength += 20
   }
 
-  if (errors.length > 0)
-  {
-    console.log(errors.join("\n"))
-  }
+  // Console Log error and strength to verify the output
+  // if (errors.length > 0)
+  // {
+  //   console.log(errors.join("\n"))
+  // }
 
-  return strength
+  if (strength > 0 && strength <= 100)
+  {
+    return strength
+  } else
+  {
+    return 0
+  }
 }

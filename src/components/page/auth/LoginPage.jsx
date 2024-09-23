@@ -1,27 +1,127 @@
 'use client'
 
+import { useContext } from 'react'
 import { signIn } from 'next-auth/react'
+
+import { EyeIcon, EyeSlashIcon, LinkIcon } from '@heroicons/react/24/outline'
+
+import { UserContext } from '@providers/context/UserProvider'
+import { MiscContext } from '@providers/context/MiscProvider'
 import RedirectAfterSignIn from '@lib/helpers/RedirectAfterSignIn'
 import { toast } from 'react-toastify'
 import { clientLog } from '@lib/helpers/winston/clientLog'
+import * as Sentry from '@sentry/nextjs'
+import Modal from '@components/atom/Modal'
 
 const LoginPage = () =>
 {
+  const { userAuthState, emailState } = useContext(UserContext)
+  const { modal1State } = useContext(MiscContext)
+
+  const [ userAuth, setUserAuth ] = userAuthState
+  const [ email, setEmail ] = emailState
+  const [ openModal1, setOpenModal1 ] = modal1State
 
   const handleSignin = async (social) => 
   {
     try
     {
-      await signIn(social, {
+      const req = await signIn(social, {
         redirect: false,
       })
 
+      if (req?.error)
+      {
+        // Handle sign-in error (e.g., wrong credentials)
+        toast.error(req.error)
+        console.error("Sign-in failed:", req.error)
+      } else
+      {
+        // Successful sign-in
+        toast.success("Signed in successfully")
+      }
+
     } catch (error)
     {
-      toast.error(error.message)
+      Sentry.captureException(error.message)
       clientLog(error.message)
-      throw new Error(error.message)
+      toast.error(error.message)
     }
+  }
+
+  const handleCredSignIn = async (e) => 
+  {
+    e.preventDefault()
+
+    if (!userAuth.email || !userAuth.password)
+    {
+      toast.error('Please enter your email and password')
+      return
+    }
+
+    try
+    {
+      const req = await signIn('credentials', {
+        email: userAuth.email,
+        password: userAuth.password,
+        redirect: false,
+      })
+
+      if (req?.error)
+      {
+        // Handle sign-in error (e.g., wrong credentials)
+        toast.error('Invalid credentials. Please try again')
+      } else
+      {
+        // Successful sign-in
+        toast.success("Signed in successfully")
+      }
+
+    } catch (error)
+    {
+      Sentry.captureException(error.message)
+      clientLog(error.message)
+      toast.error(error.message)
+    }
+
+    setUserAuth({
+      firstname: '',
+      lastname: '',
+      email: '',
+      password: '',
+      showPassword: false,
+      pwStrength: 0,
+      confirmPw: '',
+      showConfirmPw: false,
+      role: ''
+    })
+  }
+
+  const submitForgotPw = async (e) =>
+  {
+    e.preventDefault()
+
+    try
+    {
+      const req = await signIn('email', {
+        email
+      })
+
+      if (req?.error)
+      {
+        // Handle sign-in error (e.g., wrong credentials)
+        toast.error('Check your email and try again.')
+        clientLog(req.error)
+      }
+
+    } catch (error)
+    {
+      Sentry.captureException(error.message)
+      clientLog(error.message)
+      toast.error(error.message)
+    }
+
+    setEmail('')
   }
 
   return (
@@ -47,7 +147,7 @@ const LoginPage = () =>
 
         <div className="mt-10">
           <div>
-            <form action="#" method="POST" className="space-y-6">
+            <form onSubmit={ (e) => handleCredSignIn(e) } className="space-y-6">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                   Email address
@@ -57,46 +157,59 @@ const LoginPage = () =>
                     id="email"
                     name="email"
                     type="email"
-                    required
                     autoComplete="email"
                     className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    value={ userAuth.email }
+                    onChange={ (e) => setUserAuth(prev => ({
+                      ...prev,
+                      email: e.target.value
+                    })) }
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                  Password
-                </label>
-                <div className="mt-2">
+                <div className="flex justify-between items-center">
+                  <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+                    Password
+                  </label>
+                  <div className="text-sm leading-6">
+                    <button
+                      type='button'
+                      className="font-semibold text-indigo-600 hover:text-indigo-500"
+                      onClick={ () => setOpenModal1(true) }
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                </div>
+                <div className="relative mt-2">
                   <input
                     id="password"
                     name="password"
-                    type="password"
-                    required
-                    autoComplete="current-password"
+                    type={ userAuth.showPassword ? 'text' : 'password' }
                     className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    value={ userAuth.password }
+                    onChange={ (e) => setUserAuth(prev => ({
+                      ...prev,
+                      password: e.target.value
+                    })) }
                   />
-                </div>
-              </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                  />
-                  <label htmlFor="remember-me" className="ml-3 block text-sm leading-6 text-gray-700">
-                    Remember me
-                  </label>
-                </div>
-
-                <div className="text-sm leading-6">
-                  <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                    Forgot password?
-                  </a>
+                  <div className='absolute right-3 top-2'>
+                    {
+                      userAuth.showPassword ?
+                        <EyeSlashIcon className='w-5 h-5 hover:cursor-pointer' onClick={ () => setUserAuth(prev => ({
+                          ...prev,
+                          showPassword: !userAuth.showPassword
+                        })) } />
+                        :
+                        <EyeIcon className='w-5 h-5 hover:cursor-pointer' onClick={ () => setUserAuth(prev => ({
+                          ...prev,
+                          showPassword: !userAuth.showPassword
+                        })) } />
+                    }
+                  </div>
                 </div>
               </div>
 
@@ -156,6 +269,40 @@ const LoginPage = () =>
           </div>
         </div>
       </div>
+
+      {/* Forgot Password / Magic Link Modal */ }
+      <Modal
+        title={ {
+          text: 'Get Login Link',
+          iconBg: 'bg-indigo-100',
+          icon: <LinkIcon className="h-6 w-6 text-indigo-600" />
+        } }
+        btn={ {
+          text: 'Send Link',
+          color: 'bg-indigo-600',
+          textColor: 'text-white',
+          hover: 'hover:bg-indigo-500',
+          onClick: (e) => submitForgotPw(e)
+        } }
+      >
+
+        <div className='w-full'>
+          <label htmlFor="email2" className="block text-sm font-medium leading-6 text-gray-900">
+            Email address
+          </label>
+          <div className="mt-2">
+            <input
+              id="email2"
+              name="email2"
+              type="email"
+              className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              value={ email }
+              onChange={ (e) => setEmail(e.target.value) }
+            />
+          </div>
+        </div>
+
+      </Modal>
     </div>
   )
 }
